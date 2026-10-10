@@ -1,0 +1,22 @@
+name: thesis
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - tensorflow>=2.10.0,<2.11.0; sys_platform == 'win32'
+      - tensorflow>=2.10.0; sys_platform != 'win32'
+      - keras>=2.10.0
+      - "numpy>=1.22.0,<2.0.0"
+      - pandas>=1.4.0
+      - scikit-learn>=1.1.0
+      - optuna>=3.0.0
+      - Pillow>=9.0.0
+      - matplotlib>=3.5.0
+      - seaborn>=0.11.0
+      - python-dotenv>=1.0.0
+      - ipykernel>=6.15.0
+      - jupyterlab>=3.4.0
+

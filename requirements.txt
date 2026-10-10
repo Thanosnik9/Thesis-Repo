@@ -1,0 +1,37 @@
+# ==============================================================================
+# Requirements for Verticillium Wilt Detection Thesis Project
+# Python Compatibility: Python 3.9 - 3.10
+# ==============================================================================
+
+# Deep Learning Framework
+# Note: TensorFlow 2.10 is the final version with native GPU support on Windows
+tensorflow>=2.10.0,<2.11.0; sys_platform == 'win32'
+tensorflow>=2.10.0; sys_platform != 'win32'
+keras>=2.10.0
+
+# Numerical Computing & Data Processing
+# Note: NumPy < 2.0.0 is required for compatibility with TensorFlow 2.x binaries
+numpy>=1.22.0,<2.0.0
+pandas>=1.4.0
+scipy>=1.9.0
+
+# Machine Learning & Metrics
+scikit-learn>=1.1.0
+
+# Hyperparameter Optimization
+optuna>=3.0.0
+
+# Image Processing
+Pillow>=9.0.0
+
+# Data Visualization
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Environment & Configuration Management
+python-dotenv>=1.0.0
+
+# Jupyter Environment
+ipykernel>=6.15.0
+jupyterlab>=3.4.0
+
