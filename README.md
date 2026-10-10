@@ -7,6 +7,9 @@
   <a href="https://dspace.lib.uom.gr/bitstream/2159/33690/1/NikolaouAthanasiosMsc2025.pdf">
     <img src="https://img.shields.io/badge/PDF-Full%20Thesis-B31B1B?style=for-the-badge&logo=adobe-acrobat-reader&logoColor=white" alt="PDF Download" />
   </a>
+  <a href="https://www.uom.gr/mbads">
+    <img src="https://img.shields.io/badge/Program-M.Sc.%20MBADS-005A9C?style=for-the-badge" alt="UoM MBADS" />
+  </a>
   <img src="https://img.shields.io/badge/Python-3.9%20%7C%203.10-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Version" />
   <img src="https://img.shields.io/badge/TensorFlow-2.10.0-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow" />
   <img src="https://img.shields.io/badge/Optuna-3.0%2B-008080?style=for-the-badge&logo=optuna&logoColor=white" alt="Optuna" />
@@ -19,7 +22,7 @@
 
 - **Author**: Athanasios Nikolaou ([Νικολάου, Αθανάσιος](http://dspace.lib.uom.gr/browse?type=author&value=%CE%9D%CE%B9%CE%BA%CE%BF%CE%BB%CE%AC%CE%BF%CF%85%2C+%CE%91%CE%B8%CE%B1%CE%BD%CE%AC%CF%83%CE%B9%CE%BF%CF%82))
 - **Supervisor**: Prof. Evangelos Kalampokis ([Καλαμπόκης, Ευάγγελος](http://dspace.lib.uom.gr/handle/2159/33690))
-- **Program**: M.Sc. in Business Analytics and Data Science ([ΠΜΣ Αναλυτική των Επιχειρήσεων και Επιστήμη των Δεδομένων](http://dspace.lib.uom.gr/handle/2159/18768))
+- **Program**: M.Sc. in Business Analytics and Data Science ([ΠΜΣ Αναλυτική των Επιχειρήσεων και Επιστήμη των Δεδομένων](https://www.uom.gr/mbads))
 - **Institution**: University of Macedonia (Thessaloniki, Greece)  
 - **Year of Publication**: 2025  
 - **Permanent Repository Handle**: [http://dspace.lib.uom.gr/handle/2159/33690](http://dspace.lib.uom.gr/handle/2159/33690)  
@@ -32,17 +35,16 @@
 1. [Abstract](#-abstract)
 2. [Dataset & Flight Scenarios](#-dataset--flight-scenarios)
 3. [Twin-Safe Data Split Strategy](#-twin-safe-data-split-strategy)
-4. [Model Architecture & Innovations](#-model-architecture--innovations)
-   - [Custom Attention-Residual CNN](#1-custom-attention-residual-cnn)
-   - [Bayesian Hyperparameter Optimization (Optuna)](#2-bayesian-hyperparameter-optimization-optuna)
-   - [Transfer Learning Benchmarks](#3-transfer-learning-benchmarks)
-   - [Comprehensive Ablation Study](#4-comprehensive-ablation-study)
-5. [Key Results & Visual Evaluation](#-key-results--visual-evaluation)
-6. [Repository Structure](#-repository-structure)
-7. [Installation & Setup](#-installation--setup)
-8. [Configuration (.env)](#-configuration-env)
-9. [Citation & Academic Reference](#-citation--academic-reference)
-10. [License](#-license)
+4. [Custom-Optimized Model Architecture](#-custom-optimized-model-architecture)
+   - [Architectural Innovations](#1-architectural-innovations)
+   - [Bayesian Hyperparameter Tuning (Optuna 300 Trials)](#2-bayesian-hyperparameter-tuning-optuna-300-trials)
+5. [Comparative Benchmark: Custom vs. Pre-Trained Models](#-comparative-benchmark-custom-vs-pre-trained-models)
+6. [Ablation Study Analysis](#-ablation-study-analysis)
+7. [Repository Structure](#-repository-structure)
+8. [Installation & Setup](#-installation--setup)
+9. [Configuration (.env)](#-configuration-env)
+10. [Citation & Academic Reference](#-citation--academic-reference)
+11. [License](#-license)
 
 ---
 
@@ -56,7 +58,7 @@
 
 ## 🚁 Dataset & Flight Scenarios
 
-The aerial drone canopy images are categorized under two distinct ambient illumination conditions:
+The aerial drone canopy imagery was collected over olive groves in Chalkidiki, Greece, at fixed flight altitudes under two ambient illumination scenarios:
 - `clear`: Direct sunlight with high contrast and defined shadow casting.
 - `clouds`: Diffuse lighting with reduced shadows and uniform spectral response.
 
@@ -90,11 +92,11 @@ data_aug_3/
 
 ## 🛡️ Twin-Safe Data Split Strategy
 
-In high-resolution aerial datasets with augmented images or multi-pass flight captures, naive random splitting induces **severe data leakage**: augmented variants or near-duplicate captures of the same tree appear in both the training and test sets, artificially inflating generalization metrics.
+In high-resolution aerial datasets with augmented images or multi-pass flight captures, naive random splitting causes **severe data leakage**: augmented variants or paired flight captures of the same tree appear in both training and test partitions, artificially inflating metrics.
 
-To eliminate this bias, a **twin-aware split** (`split_data`) is enforced:
+To eliminate this bias, a **twin-aware split** (`split_data`) is strictly enforced:
 1. Unique root image IDs (`unique_image_ids`) are extracted from file names across all subfolders.
-2. Partitioning occurs at the root identifier level (60% Train, 20% Validation, 20% Test, `random_state=42`).
+2. Partitioning occurs at the root tree identifier level (60% Train, 20% Validation, 20% Test, `random_state=42`).
 3. Split indices are subsequently mapped back to the full dataset:
    - **Training Set**: 7,248 samples (60%)
    - **Validation Set**: 2,416 samples (20%)
@@ -104,38 +106,40 @@ To eliminate this bias, a **twin-aware split** (`split_data`) is enforced:
 
 ---
 
-## 🧠 Model Architecture & Innovations
+## 🧠 Custom-Optimized Model Architecture
 
-### 1. Custom Attention-Residual CNN
+### 1. Architectural Innovations
 
-The custom network combines three core design principles:
-- **Separable Convolutions**: Replaces standard $3 \times 3$ and $5 \times 5$ convolutions with Depthwise Separable Convolutions (`SeparableConv2D`), significantly reducing parameter count and FLOPs without sacrificing spatial feature extraction.
-- **Residual Connections**: Skip paths ($x + \mathcal{F}(x)$) with $1 \times 1$ projection convolutions and Batch Normalization to facilitate unobstructed gradient flow across deep feature hierarchies.
-- **Multi-Head Self-Attention (`MultiHeadAttention`)**: An 8-head self-attention module placed after residual feature extraction to capture long-range spatial dependencies and subtle foliar discolouration signatures.
+The centerpiece of this research is a purpose-built **Attention-Residual Convolutional Neural Network** designed to capture subtle foliar necrosis while maintaining high computational efficiency for agricultural edge deployment:
+
+- **Depthwise Separable Convolutions (`SeparableConv2D`)**: Decomposes spatial convolution into depthwise and pointwise stages, radically reducing parameter overhead while preserving spatial representational capacity.
+- **Identity Residual Connections**: Skip paths ($x + \mathcal{F}(x)$) augmented with $1 \times 1$ projection convolutions and Batch Normalization to prevent vanishing gradients across deep stages.
+- **Multi-Head Self-Attention (`MultiHeadAttention`)**: An 8-head self-attention mechanism integrated after residual blocks to capture long-range contextual dependencies and distinguish localized canopy discoloration from ambient soil/weed background noise.
+- **Global Average Pooling**: Replaces parameter-heavy flattening layers, drastically mitigating overfitting.
 
 ```mermaid
 flowchart TD
-    In["Input Image (64x64x3 RGB)"] --> C1["Conv2D (Filters, 3x3) + ReLU"]
+    In["Input Canopy Image (64x64x3 RGB)"] --> C1["Conv2D (121 Filters, 3x3) + ReLU"]
     C1 --> P1["MaxPooling2D (2x2)"]
-    P1 --> RB["Residual Block (SeparableConv2D + BatchNorm + ReLU)"]
-    RB --> AB["Attention Block (MultiHeadAttention 8 heads + Residual Add)"]
+    P1 --> RB["4x Residual Blocks (SeparableConv2D + BatchNorm + ReLU)"]
+    RB --> AB["Multi-Head Attention Blocks (8 Heads + Residual Add)"]
     AB --> P2["MaxPooling2D (2x2)"]
     P2 --> GAP["GlobalAveragePooling2D"]
-    GAP --> D1["Dense (Units) + ReLU"]
-    D1 --> Drop["Dropout (Rate)"]
-    Drop --> Out["Dense (2, Softmax) - Healthy vs Damaged"]
+    GAP --> D1["Dense (1,387 Units) + ReLU"]
+    D1 --> Drop["Dropout (Rate = 0.408)"]
+    Drop --> Out["Dense (2, Softmax) - Healthy vs. Damaged"]
 ```
 
 ---
 
-### 2. Bayesian Hyperparameter Optimization (Optuna)
+### 2. Bayesian Hyperparameter Tuning (Optuna 300 Trials)
 
-Hyperparameter optimization was formulated as a 300-trial Bayesian search using Tree-structured Parzen Estimator (TPE) sampler paired with automated pruning (`TFKerasPruningCallback`):
+The architecture was optimized through a rigorous **300-trial Bayesian search** using Tree-structured Parzen Estimator (TPE) sampler paired with automated pruning (`TFKerasPruningCallback`):
 
-| Hyperparameter | Search Space | Optimal Trial Value | Description |
+| Hyperparameter | Search Space | Optimal Trial Value | Architectural Function |
 | :--- | :---: | :---: | :--- |
 | `num_residual_blocks` | $[2, 5]$ | **4** | Number of sequential residual-attention stages |
-| `filters` | $[32, 128]$ | **121** | Convolutional feature channels |
+| `filters` | $[32, 128]$ | **121** | Feature channels per convolution layer |
 | `kernel_size` | $[3, 5]$ | **5** | Spatial receptive field size |
 | `dense_units` | $[512, 2048]$ | **1387** | Latent dimension in classification head |
 | `dropout_rate` | $[0.3, 0.5]$ | **0.408** | Regularization rate before final layer |
@@ -143,48 +147,43 @@ Hyperparameter optimization was formulated as a 300-trial Bayesian search using 
 
 ---
 
-### 3. Transfer Learning Benchmarks
+## 🏆 Comparative Benchmark: Custom vs. Pre-Trained Models
 
-To benchmark the custom model against established computer vision backbones, three pre-trained ImageNet architectures were fine-tuned using identical data splits, augmentations, and classification heads (`GlobalAveragePooling2D` + `Dropout(0.3)` + `Dense(2, Softmax)`):
-- **MobileNetV2**: Efficient inverted residual blocks for edge computing.
-- **EfficientNetB0**: Compound-scaled neural network.
-- **ResNet50V2**: 50-layer deep pre-activation residual network.
+The custom-designed model was directly compared against prominent transfer learning backbones (MobileNetV2, EfficientNetB0, and ResNet50V2) trained under identical data splits, augmentations, and evaluation criteria (**Thesis Table 1, p. 51**):
+
+| Model Architecture | Test Accuracy | Precision (Healthy) | Recall (Healthy) | Precision (Damaged) | Recall (Damaged) | F1-Score (Healthy) | F1-Score (Damaged) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Custom-Optimized Model (Proposed)** | **0.89** | **0.88** | **0.94** | **0.90** | **0.82** | **0.91** | **0.86** |
+| ResNet50V2 | 0.59 | 0.65 | 0.59 | 0.53 | 0.59 | 0.62 | 0.56 |
+| EfficientNetB0 | 0.56 | 0.56 | 1.00 | 0.00 | 0.00 | 0.72 | 0.00 |
+| MobileNetV2 | 0.53 | 0.64 | 0.37 | 0.48 | 0.74 | 0.47 | 0.58 |
+
+> 💡 **Core Finding**: The custom Attention-Residual CNN outperforms standard ImageNet pre-trained architectures by **+30% overall accuracy**. Generic pre-trained models struggled with the specialized high-frequency spatial patterns of aerial tree canopies (e.g. EfficientNetB0 collapsed to predicting only the majority class), whereas the custom model achieved balanced, robust sensitivity on both healthy and infected trees.
+
+### Test Set Classification Distribution
+
+<p align="center">
+  <img src="./assets/confusion_matrix_best_model.png" width="55%" alt="Confusion Matrix - Custom-Optimized Model" />
+</p>
+<p align="center">
+  <em>Figure 1: Confusion matrix of the Custom-Optimized Model on the unseen test set (N = 2,416), demonstrating 1,251 true negatives (healthy) and 766 true positives (infected).</em>
+</p>
 
 ---
 
-### 4. Comprehensive Ablation Study
+## 🔬 Ablation Study Analysis
 
-An ablation matrix systematically isolates the contribution of each design component:
-1. **Best Model (Optuna)**: Full architecture ($N=4$, $F=121$, $K=5$, Attention, BatchNorm, Dropout).
-2. **Baseline**: Reference unablated network.
-3. **No Residual Blocks**: Skip connections removed (`num_residual_blocks = 0`).
-4. **No Attention Blocks**: Multi-Head Attention omitted from every block.
-5. **No Dropout**: Regularization omitted (`dropout_rate = 0.0`).
-6. **Fixed Kernel Size**: Standard $3 \times 3$ kernels substituted for the optimal $5 \times 5$.
-7. **No Batch Normalization**: Batch normalization removed from all residual blocks.
+To empirically validate each architectural decision, a systematic ablation study was conducted over 200 epochs per variant (**Thesis Table 2, p. 58**):
 
----
-
-## 📊 Key Results & Visual Evaluation
-
-On the held-out test set ($N=2,416$ samples), the optimal Optuna-tuned model achieved state-of-the-art diagnostic discrimination:
-
-| Metric | Healthy Trees (Class 0) | Damaged Trees (Class 1) | Overall / Macro |
-| :--- | :---: | :---: | :---: |
-| **Precision** | **0.87** | **0.88** | 0.88 |
-| **Recall** | **0.92** | **0.81** | 0.87 |
-| **F1-Score** | **0.89** | **0.85** | 0.87 |
-| **Test Accuracy** | — | — | **~88%** |
-
-### Empirical Visualizations
-
-<p align="center">
-  <img src="./assets/loss_comparison_best_model.png" width="48%" alt="Training and Validation Loss Curve" />
-  <img src="./assets/confusion_matrix_best_model.png" width="48%" alt="Test Set Confusion Matrix Heatmap" />
-</p>
-<p align="center">
-  <em>Figure 1: (Left) Loss convergence across 200 epochs showing stable optimization without severe overfitting. (Right) Confusion matrix heatmap on unseen test samples (1,277 true negatives, 834 true positives).</em>
-</p>
+| Model Variant | Test Accuracy | Test F1-Score | Test AUROC | Test AUPRC | Impact of Component Removal |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **Custom-Optimized Model (Full)** | **0.891** | **0.875** | **0.912** | **0.891** | **Optimal complete architecture** |
+| Baseline (Default Parameters) | 0.776 | 0.776 | 0.853 | 0.824 | Unoptimized hyperparameters |
+| No Dropout | 0.758 | 0.756 | 0.789 | 0.771 | Reduced regularization; overfitting tendency |
+| Fixed Kernel Size ($3 \times 3$) | 0.735 | 0.730 | 0.780 | 0.756 | Rigid receptive field limits multi-scale foliage detection |
+| No Attention Blocks | 0.694 | 0.690 | 0.766 | 0.728 | **-20% drop**: Model cannot focus on localized discoloration |
+| No Batch Normalization | 0.616 | 0.612 | 0.689 | 0.665 | **-28% drop**: Internal covariate shift destabilizes convergence |
+| No Residual Blocks | 0.604 | 0.597 | 0.661 | 0.630 | **-29% drop**: Vanishing gradients impede deep representation learning |
 
 ---
 
@@ -192,16 +191,15 @@ On the held-out test set ($N=2,416$ samples), the optimal Optuna-tuned model ach
 
 ```text
 Thesis-Repo/
-├── assets/                                    # Exported visualization figures
-│   ├── confusion_matrix_best_model.png
-│   └── loss_comparison_best_model.png
+├── assets/                                    # Evaluation visualization figures
+│   └── confusion_matrix_best_model.png
 ├── src/                                       # Modular Python package
 │   ├── __init__.py
 │   ├── dataset.py                             # Data loaders, augmentations, and twin-safe split
 │   └── models.py                              # Custom and transfer learning network architectures
 │
 ├── 01_optuna_hyperparameter_tuning.ipynb     # 300-trial Bayesian search & optimal model training
-├── 02_pretrained_transfer_learning.ipynb      # Transfer learning benchmarks (MobileNet, ResNet, etc.)
+├── 02_pretrained_transfer_learning.ipynb      # Transfer learning comparative benchmarks
 ├── 03_ablation_study.ipynb                    # Component-wise architectural ablation experiments
 │
 ├── .editorconfig                              # Standard formatting guidelines
@@ -209,7 +207,7 @@ Thesis-Repo/
 ├── .gitignore                                 # Git rules for datasets, model weights, and cache
 ├── environment.yml                            # Conda environment specification
 ├── LICENSE                                    # MIT License
-├── pyproject.toml                             # Project build and linter configurations
+├── pyproject.toml                             # Project build and tool configurations
 ├── README.md                                  # Comprehensive thesis documentation
 └── requirements.txt                           # Pinned Python package dependencies
 ```
