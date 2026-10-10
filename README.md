@@ -39,7 +39,7 @@
    - [Architectural Innovations](#1-architectural-innovations)
    - [Bayesian Hyperparameter Tuning (Optuna 300 Trials)](#2-bayesian-hyperparameter-tuning-optuna-300-trials)
 5. [Comparative Benchmark: Custom vs. Pre-Trained Models](#-comparative-benchmark-custom-vs-pre-trained-models)
-6. [Ablation Study Analysis](#-ablation-study-analysis)
+6. [Ablation Study Analysis & Diagnostic Curves](#-ablation-study-analysis--diagnostic-curves)
 7. [Repository Structure](#-repository-structure)
 8. [Installation & Setup](#-installation--setup)
 9. [Configuration (.env)](#-configuration-env)
@@ -160,18 +160,9 @@ The custom-designed model was directly compared against prominent transfer learn
 
 > 💡 **Core Finding**: The custom Attention-Residual CNN outperforms standard ImageNet pre-trained architectures by **+30% overall accuracy**. Generic pre-trained models struggled with the specialized high-frequency spatial patterns of aerial tree canopies (e.g. EfficientNetB0 collapsed to predicting only the majority class), whereas the custom model achieved balanced, robust sensitivity on both healthy and infected trees.
 
-### Test Set Classification Distribution
-
-<p align="center">
-  <img src="./assets/confusion_matrix_best_model.png" width="55%" alt="Confusion Matrix - Custom-Optimized Model" />
-</p>
-<p align="center">
-  <em>Figure 1: Confusion matrix of the Custom-Optimized Model on the unseen test set (N = 2,416), demonstrating 1,251 true negatives (healthy) and 766 true positives (infected).</em>
-</p>
-
 ---
 
-## 🔬 Ablation Study Analysis
+## 🔬 Ablation Study Analysis & Diagnostic Curves
 
 To empirically validate each architectural decision, a systematic ablation study was conducted over 200 epochs per variant (**Thesis Table 2, p. 58**):
 
@@ -185,6 +176,15 @@ To empirically validate each architectural decision, a systematic ablation study
 | No Batch Normalization | 0.616 | 0.612 | 0.689 | 0.665 | **-28% drop**: Internal covariate shift destabilizes convergence |
 | No Residual Blocks | 0.604 | 0.597 | 0.661 | 0.630 | **-29% drop**: Vanishing gradients impede deep representation learning |
 
+### Receiver Operating Characteristic (ROC) & Precision-Recall (PRC) Curves
+
+<p align="center">
+  <img src="./assets/roc_prc_curves_ablation.png" width="90%" alt="ROC and PRC Curves Across Ablation Models" />
+</p>
+<p align="center">
+  <em>Figure 1: Comparison of ROC and PRC curves across all ablation variants (Thesis Figure 26, p. 89). The Custom-Optimized Model (blue curve) consistently dominates across all classification thresholds, verifying high sensitivity and precision under class-imbalanced agricultural surveillance.</em>
+</p>
+
 ---
 
 ## 📁 Repository Structure
@@ -192,7 +192,7 @@ To empirically validate each architectural decision, a systematic ablation study
 ```text
 Thesis-Repo/
 ├── assets/                                    # Evaluation visualization figures
-│   └── confusion_matrix_best_model.png
+│   └── roc_prc_curves_ablation.png            # Figure 26: ROC & PRC curves
 ├── src/                                       # Modular Python package
 │   ├── __init__.py
 │   ├── dataset.py                             # Data loaders, augmentations, and twin-safe split
