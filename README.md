@@ -1,33 +1,40 @@
-# Detection and Classification of Verticillium Dahliae in Olive Groves Using Aerial Drone Imagery & Deep Neural Networks
+# Development and Optimization of a Neural Network for the Detection of Verticillium Disease in Olive Trees
 
 <p align="center">
+  <a href="http://dspace.lib.uom.gr/handle/2159/33690">
+    <img src="https://img.shields.io/badge/Thesis-DSpace%20UoM-003366?style=for-the-badge&logo=open-access&logoColor=white" alt="DSpace Thesis" />
+  </a>
+  <a href="https://dspace.lib.uom.gr/bitstream/2159/33690/1/NikolaouAthanasiosMsc2025.pdf">
+    <img src="https://img.shields.io/badge/PDF-Full%20Thesis-B31B1B?style=for-the-badge&logo=adobe-acrobat-reader&logoColor=white" alt="PDF Download" />
+  </a>
   <img src="https://img.shields.io/badge/Python-3.9%20%7C%203.10-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Version" />
   <img src="https://img.shields.io/badge/TensorFlow-2.10.0-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow" />
   <img src="https://img.shields.io/badge/Optuna-3.0%2B-008080?style=for-the-badge&logo=optuna&logoColor=white" alt="Optuna" />
-  <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-Learn" />
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License: MIT" />
-  <img src="https://img.shields.io/badge/Institution-Univ.%20of%20Macedonia-003366?style=for-the-badge" alt="University of Macedonia" />
 </p>
 
 ---
 
-## 🎓 Academic Context
+## 🎓 Academic Information & Thesis Metadata
 
-- **Program**: M.Sc. in Data Science and Business Analytics  
+- **Author**: Athanasios Nikolaou ([Νικολάου, Αθανάσιος](http://dspace.lib.uom.gr/browse?type=author&value=%CE%9D%CE%B9%CE%BA%CE%BF%CE%BB%CE%AC%CE%BF%CF%85%2C+%CE%91%CE%B8%CE%B1%CE%BD%CE%AC%CF%83%CE%B9%CE%BF%CF%82))
+- **Supervisor**: Prof. Evangelos Kalampokis ([Καλαμπόκης, Ευάγγελος](http://dspace.lib.uom.gr/handle/2159/33690))
+- **Program**: M.Sc. in Business Analytics and Data Science ([ΠΜΣ Αναλυτική των Επιχειρήσεων και Επιστήμη των Δεδομένων](http://dspace.lib.uom.gr/handle/2159/18768))
 - **Institution**: University of Macedonia (Thessaloniki, Greece)  
-- **Thesis Title**: *Development and Optimization of a Neural Network for the Detection of Verticillium Disease in Olive Trees*  
-- **Author**: Athanasios Nikolaou  
+- **Year of Publication**: 2025  
+- **Permanent Repository Handle**: [http://dspace.lib.uom.gr/handle/2159/33690](http://dspace.lib.uom.gr/handle/2159/33690)  
+- **Full Text (PDF)**: [NikolaouAthanasiosMsc2025.pdf](https://dspace.lib.uom.gr/bitstream/2159/33690/1/NikolaouAthanasiosMsc2025.pdf)
 
 ---
 
 ## 📌 Table of Contents
 
-1. [Abstract & Executive Summary](#-abstract--executive-summary)
+1. [Abstract](#-abstract)
 2. [Dataset & Flight Scenarios](#-dataset--flight-scenarios)
 3. [Twin-Safe Data Split Strategy](#-twin-safe-data-split-strategy)
-4. [Model Architectures & Methodology](#-model-architectures--methodology)
+4. [Model Architecture & Innovations](#-model-architecture--innovations)
    - [Custom Attention-Residual CNN](#1-custom-attention-residual-cnn)
-   - [Bayesian Optimization with Optuna (300 Trials)](#2-bayesian-optimization-with-optuna-300-trials)
+   - [Bayesian Hyperparameter Optimization (Optuna)](#2-bayesian-hyperparameter-optimization-optuna)
    - [Transfer Learning Benchmarks](#3-transfer-learning-benchmarks)
    - [Comprehensive Ablation Study](#4-comprehensive-ablation-study)
 5. [Key Results & Visual Evaluation](#-key-results--visual-evaluation)
@@ -39,28 +46,22 @@
 
 ---
 
-## 📖 Abstract & Executive Summary
+## 📖 Abstract
 
-Verticillium wilt (*Verticillium dahliae Kleb.*) is a devastating vascular soil-borne pathogen affecting olive groves (*Olea europaea*) across the Mediterranean basin, leading to severe canopy defoliation, branch dieback, and substantial economic loss. Traditional ground scouting is labor-intensive, slow, and often unable to capture early canopy stress symptoms across large plantations.
-
-This research presents an end-to-end computer vision framework that leverages **aerial imagery collected via Unmanned Aerial Vehicles (UAVs / drones)** under multiple atmospheric and illumination conditions (**clear** and **cloudy** skies). The primary scientific and engineering contributions include:
-
-1. **Custom Attention-Residual CNN**: An architecture integrating Depthwise Separable Convolutions, identity residual mappings, and Multi-Head Self-Attention to isolate subtle foliar necrosis while remaining parameter-efficient.
-2. **Bayesian Hyperparameter Optimization**: A 300-trial Optuna study employing automated pruning via `TFKerasPruningCallback` across architectural depth, filter counts, receptive field sizes, and optimization parameters.
-3. **Data Leakage Prevention**: A twin-aware splitting strategy ensuring augmented and multi-view aerial pairs remain strictly isolated within either training, validation, or testing partitions.
-4. **Empirical Benchmarking & Ablation**: Comparative evaluation against established transfer learning baselines (**MobileNetV2**, **EfficientNetB0**, **ResNet50V2**) and systematic ablation of all individual architectural components.
-5. **Modular Codebase**: Decoupled, reusable Python library (`src/`) alongside sequenced experiment notebooks.
+> *"This study focuses on detecting Verticillium wilt disease in olive trees using artificial intelligence and deep learning. The aim is to develop and evaluate a customised neural network that can detect the disease from images, helping to improve agricultural management and reduce the economic impact of the disease on the agricultural sector. The methodology includes the collection, pre-processing and enhancement of images related to the disease. A balanced and representative dataset was created using techniques such as data augmentation and normalisation. A custom CNN model was then designed and optimized using the Optuna tool, with a particular focus on structural features such as attention and residual blocks. This was followed by an evaluation through an ablation study, comparison with pre-trained models and visual analysis of performance. The results showed that the proposed model outperforms the baseline and pre-trained architectures in terms of accuracy, achieving high performance on metrics such as precision, recall, and F1-score. Furthermore, the contribution of individual elements of the architecture (such as attention mechanisms) proved to be significant, according to the ablation model analysis. Evaluation with ROC and PRC curves confirmed the stability and generalisation of the model. The findings indicate that the use of targeted deep learning techniques can enhance the early diagnosis of Verticillium wilt and be integrated into agricultural monitoring systems."*
+> 
+> — **Athanasios Nikolaou, Master's Thesis, University of Macedonia, 2025**
 
 ---
 
 ## 🚁 Dataset & Flight Scenarios
 
-The aerial imagery encompasses olive tree canopies captured under two distinct flight scenarios:
+The aerial drone canopy images are categorized under two distinct ambient illumination conditions:
 - `clear`: Direct sunlight with high contrast and defined shadow casting.
 - `clouds`: Diffuse lighting with reduced shadows and uniform spectral response.
 
 Both flight environments contain balanced assessments across two diagnostic categories:
-- `Healthy_augmented`: Asymptomatic olive canopies.
+- `Healthy_augmented`: Asymptomatic olive tree canopies.
 - `Damaged_augmented`: Foliage displaying characteristic symptoms of *Verticillium dahliae* infection.
 
 ### Expected Directory Hierarchy
@@ -103,7 +104,7 @@ To eliminate this bias, a **twin-aware split** (`split_data`) is enforced:
 
 ---
 
-## 🧠 Model Architectures & Methodology
+## 🧠 Model Architecture & Innovations
 
 ### 1. Custom Attention-Residual CNN
 
@@ -127,7 +128,7 @@ flowchart TD
 
 ---
 
-### 2. Bayesian Optimization with Optuna (300 Trials)
+### 2. Bayesian Hyperparameter Optimization (Optuna)
 
 Hyperparameter optimization was formulated as a 300-trial Bayesian search using Tree-structured Parzen Estimator (TPE) sampler paired with automated pruning (`TFKerasPruningCallback`):
 
@@ -182,7 +183,7 @@ On the held-out test set ($N=2,416$ samples), the optimal Optuna-tuned model ach
   <img src="./assets/confusion_matrix_best_model.png" width="48%" alt="Test Set Confusion Matrix Heatmap" />
 </p>
 <p align="center">
-  <em>Figure 1: (Left) Convergence of training and validation loss for the optimal Optuna model across 200 epochs. (Right) Confusion matrix heatmap on the unseen test set showing 1,277 true negatives and 834 true positives.</em>
+  <em>Figure 1: (Left) Loss convergence across 200 epochs showing stable optimization without severe overfitting. (Right) Confusion matrix heatmap on unseen test samples (1,277 true negatives, 834 true positives).</em>
 </p>
 
 ---
@@ -304,17 +305,20 @@ Execute the notebooks in sequence:
 
 ## 📚 Citation & Academic Reference
 
-If you utilize this codebase, methodologies, or findings in academic research, please cite as follows:
+If you utilize this codebase, methodologies, or findings in academic research, please cite the official thesis:
 
 ```bibtex
-@mastersthesis{nikolaou2024verticillium,
+@mastersthesis{nikolaou2025verticillium,
   author       = {Athanasios Nikolaou},
   title        = {Development and Optimization of a Neural Network for the Detection of Verticillium Disease in Olive Trees},
   school       = {University of Macedonia},
-  department   = {Data Science and Business Analytics},
-  year         = {2024},
+  department   = {M.Sc. in Business Analytics and Data Science},
+  year         = {2025},
+  month        = {October},
   address      = {Thessaloniki, Greece},
-  type         = {Master's Thesis}
+  type         = {Master's Thesis},
+  supervisor   = {Evangelos Kalampokis},
+  url          = {http://dspace.lib.uom.gr/handle/2159/33690}
 }
 ```
 
@@ -322,4 +326,4 @@ If you utilize this codebase, methodologies, or findings in academic research, p
 
 ## 📄 License
 
-This repository is distributed under the [MIT License](./LICENSE). Feel free to adapt and build upon this work for academic, personal, or commercial applications.
+The code in this repository is distributed under the [MIT License](./LICENSE). The accompanying thesis document is openly accessible via the [University of Macedonia Digital Repository (Psepheda)](http://dspace.lib.uom.gr/handle/2159/33690).
