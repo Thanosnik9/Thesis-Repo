@@ -21,7 +21,7 @@
 ## 🎓 Academic Information & Thesis Metadata
 
 - **Author**: Athanasios Nikolaou ([Νικολάου, Αθανάσιος](http://dspace.lib.uom.gr/browse?type=author&value=%CE%9D%CE%B9%CE%BA%CE%BF%CE%BB%CE%AC%CE%BF%CF%85%2C+%CE%91%CE%B8%CE%B1%CE%BD%CE%AC%CF%83%CE%B9%CE%BF%CF%82))
-- **Supervisor**: Prof. Evangelos Kalampokis ([Καλαμπόκης, Ευάγγελος](http://dspace.lib.uom.gr/handle/2159/33690))
+- **Supervisor**: Prof. Evangelos Kalampokis ([Καλαμπόκης, Ευάγγελος](https://www.uom.gr/ekal))
 - **Program**: M.Sc. in Business Analytics and Data Science ([ΠΜΣ Αναλυτική των Επιχειρήσεων και Επιστήμη των Δεδομένων](https://www.uom.gr/mbads))
 - **Institution**: University of Macedonia (Thessaloniki, Greece)  
 - **Year of Publication**: 2025  
