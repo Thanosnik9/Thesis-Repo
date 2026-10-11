@@ -30,3 +30,14 @@ target-version = ['py39', 'py310']
 profile = "black"
 line_length = 100
 
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "PLW", "C4"]
+ignore = ["E501", "W293"]
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E501", "W293", "F811", "F401", "I001", "E402", "F402"]
+
